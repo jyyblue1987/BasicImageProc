@@ -102,15 +102,35 @@ void main(int argc, char *argv[])
 
     FILE *filewrite = fopen(output, "wb");
     if( filewrite == NULL )
+    {
+        free(img);
         return;
+    }
+
+    if( strcmp(format, "BMP") == 0 )
+    {   
+        printf("Save Image To %s with BMP\n", output);
+        struct BMP_Header *header = (struct BMP_Header *)malloc(sizeof(struct BMP_Header));
+        struct DIB_Header *DIBheader = (struct DIB_Header *)malloc(sizeof(struct DIB_Header));
+        
+        makeBMPHeader(header, width, height);
+        makeDIBHeader(DIBheader, width, height);
+        
+        writeBMPHeader(filewrite, header);
+        writeDIBHeader(filewrite, DIBheader);
+
+        writePixelsBMP(filewrite, img, width, height);
+
+        free(header);
+        free(DIBheader);        
+    }
 
     if( strcmp(format, "PPM") == 0 )
     {   
-        printf("Save Image To %s\n", output);
+        printf("Save Image To %s with PPM\n", output);
         struct PPM_Header *header = (struct PPM_Header *)malloc(sizeof(struct PPM_Header));
 
-        makePPMHeader(header, width, height);
-        printf("Width=%d\n", header->width);
+        makePPMHeader(header, width, height);        
         writePPMHeader(filewrite, header);
         writePixelsPPM(filewrite, img, width, height);
 
