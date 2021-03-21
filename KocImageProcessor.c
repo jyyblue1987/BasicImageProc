@@ -22,7 +22,7 @@ void main(int argc, char *argv[])
     
     int r = 0, g = 0, b = 0;
     char output[255] = "output.bmp";
-    char format[10] = "BMP";
+    char format[10] = "";
 
     while((opt = getopt(argc, argv, "o:t:r:g:b:")) != -1)  
     {  
@@ -115,7 +115,30 @@ void main(int argc, char *argv[])
 
     colorShiftPixels(img, width, height, r, g, b);
 
-    if( strcmp(format, "BMP") == 0 )
+    if( strcmp(format, "") == 0) 
+    {
+        char *p1 = strrchr(output, '.');
+        if( strcmp(p1 + 1, "bmp") == 0 )
+            strcpy(format, "BMP" );
+
+        if( strcmp(p1 + 1, "ppm") == 0 )
+            strcpy(format, "PPM" );
+
+        printf("file format: %s\n", format);        
+    }
+
+    if( strcmp(format, "PPM") == 0 )
+    {   
+        printf("Save Image To %s with PPM\n", output);        
+        struct PPM_Header *header = (struct PPM_Header *)malloc(sizeof(struct PPM_Header));
+
+        makePPMHeader(header, width, height);        
+        writePPMHeader(filewrite, header);
+        writePixelsPPM(filewrite, img, width, height);
+
+        free(header);
+    }
+    else     
     {   
         printf("Save Image To %s with BMP\n", output);
         struct BMP_Header *header = (struct BMP_Header *)malloc(sizeof(struct BMP_Header));
@@ -131,18 +154,6 @@ void main(int argc, char *argv[])
 
         free(header);
         free(DIBheader);        
-    }
-
-    if( strcmp(format, "PPM") == 0 )
-    {   
-        printf("Save Image To %s with PPM\n", output);        
-        struct PPM_Header *header = (struct PPM_Header *)malloc(sizeof(struct PPM_Header));
-
-        makePPMHeader(header, width, height);        
-        writePPMHeader(filewrite, header);
-        writePixelsPPM(filewrite, img, width, height);
-
-        free(header);
     }
 
     for(int i = 0; i < height; i++)
