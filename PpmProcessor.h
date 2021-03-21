@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include "PixelProcessor.h"
 
 struct PPM_Header{
 	//The first "line" is a magic PPM identifier, it can be "P3" or "P6" (not including the double quotes!)

@@ -2,27 +2,50 @@
 #include "PixelProcessor.h"
 #include <string.h>
 #include <stdio.h>
+#include <ctype.h>
 
 void readPPMHeader(FILE *file, struct PPM_Header *header)
 {
     printf("**PPM HEADER**\n");
 
-    fread(&header->magic_number, sizeof(char), 1, file);
+    // fread(&header->magic_number, sizeof(char), 1, file);
+    // printf("Magic Number: %.2s\n", header->magic_number);
+
+    char ch;
+    int  maxval;
+
+    if (fscanf(file, "P%c\n", &ch) != 1 || ch != '6') 
+        return;
+
+    header->magic_number[0] = ch;
+    
+    /* skip comments */
+    ch = getc(file);
+    while (ch == '#')
+    {
+        do {
+            ch = getc(file);
+        } while (ch != '\n');	/* read to the end of the line */
+
+        ch = getc(file);            /* thanks, Elliot */
+    }
+
+    if (!isdigit(ch)) 
+        return;
+
+    ungetc(ch, file);		/* put that digit back */
+
+    /* read the width, height, and maximum value for a pixel */
+    fscanf(file, "%d%d%d\n", &(header->width), &(header->height), &(header->max_color_value));
     printf("Magic Number: %.2s\n", header->magic_number);
-
-    fread(&header->width, sizeof(int), 1, file);
     printf("Width: %d\n", header->width);
-
-    fread(&header->height, sizeof(int), 1, file);
     printf("Height: %d\n", header->height);
-
-    fread(&header->max_color_value, sizeof(int), 1, file);
     printf("Max Color Value: %d\n", header->max_color_value);
 }
 
 void writePPMHeader(FILE *file, struct PPM_Header *header)
 {
-    fwrite(header, sizeof(struct PPM_Header), 1, file);
+    fprintf(file, "P6\n%d %d\n%d\n", header->width, header->height, header->max_color_value);
 }
 
 void makePPMHeader(struct PPM_Header *header, int width, int height)
@@ -35,53 +58,32 @@ void makePPMHeader(struct PPM_Header *header, int width, int height)
 
 void readPixelsPPM(FILE* file, struct Pixel** pArr, int width, int height)
 {
-    int i, j, padding;
-    char temp[4];
-    padding = width % 4;
-
-    if (padding != 0)
-    {
-        padding = (4 - (3 * width) % 4) % 4;
-    }
+    int i, j;
+    
     // read in data
-    for (i = 0; i < width; i++)
+    for (i = 0; i < height; i++)
     {
-        for (j = 0; j < height; j++)
+        for (j = 0; j < width; j++)
         {
             fread(&pArr[i][j].b, 1, 1, file);
             fread(&pArr[i][j].g, 1, 1, file);
             fread(&pArr[i][j].r, 1, 1, file);
-        }
-        if (padding != 0)
-        {
-            if (fread(&temp, padding, 1, file) != 1)
-                printf("\nError reading padding in row %d \n", i);
-        }
+        }       
     }
 }
 
 void writePixelsPPM(FILE* file, struct Pixel** pArr, int width, int height)
 {
-    int i, j, padding;
-    char temp[4];
-    padding = width % 4;
+    int i, j;
 
-    if (padding != 0)
+    for (i = 0; i < height; i++)
     {
-        padding = (4 - (3 * width) % 4) % 4;
-    }
-
-    for (i = 0; i < width; i++)
-    {
-        for (j = 0; j < height; j++)
+        for (j = 0; j < width; j++)
         {
             fwrite(&pArr[i][j].b, 1, 1, file);
             fwrite(&pArr[i][j].g, 1, 1, file);
             fwrite(&pArr[i][j].r, 1, 1, file);
         }
-        if (padding != 0)
-        {
-            fwrite(&temp, padding, 1, file);
-        }
+        
     }
 }
