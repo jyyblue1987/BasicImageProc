@@ -104,6 +104,8 @@ void main(int argc, char *argv[])
         return;
     }
 
+    colorShiftPixels(img, width, height, r, g, b);
+
     if( strcmp(format, "BMP") == 0 )
     {   
         printf("Save Image To %s with BMP\n", output);
