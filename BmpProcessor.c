@@ -177,9 +177,9 @@ void writePixelsBMP(FILE *file, struct Pixel **pArr, int width, int height)
     {
         for (j = 0; j < width; j++)
         {
-            fwrite(&pArr[i][j].b, 1, 1, file);
-            fwrite(&pArr[i][j].g, 1, 1, file);
-            fwrite(&pArr[i][j].r, 1, 1, file);
+            fwrite(&pArr[height - i - 1][j].b, 1, 1, file);
+            fwrite(&pArr[height - i - 1][j].g, 1, 1, file);
+            fwrite(&pArr[height - i - 1][j].r, 1, 1, file);
         }
         if (padding != 0)
         {

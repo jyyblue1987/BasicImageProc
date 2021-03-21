@@ -91,9 +91,6 @@ void main(int argc, char *argv[])
             img[i] = (struct Pixel*) malloc(width * sizeof(struct Pixel));
 
         readPixelsPPM(file, img, width, height);
-        
-        for(int i = 0; i < height; i++)
-            free(img[i]);
 
         free(header);
     }
@@ -127,7 +124,7 @@ void main(int argc, char *argv[])
 
     if( strcmp(format, "PPM") == 0 )
     {   
-        printf("Save Image To %s with PPM\n", output);
+        printf("Save Image To %s with PPM\n", output);        
         struct PPM_Header *header = (struct PPM_Header *)malloc(sizeof(struct PPM_Header));
 
         makePPMHeader(header, width, height);        
@@ -136,6 +133,9 @@ void main(int argc, char *argv[])
 
         free(header);
     }
+
+    for(int i = 0; i < height; i++)
+        free(img[i]);
 
     free(img);
     

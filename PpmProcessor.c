@@ -65,24 +65,24 @@ void readPixelsPPM(FILE* file, struct Pixel** pArr, int width, int height)
     {
         for (j = 0; j < width; j++)
         {
-            fread(&pArr[i][j].b, 1, 1, file);
-            fread(&pArr[i][j].g, 1, 1, file);
             fread(&pArr[i][j].r, 1, 1, file);
+            fread(&pArr[i][j].g, 1, 1, file);
+            fread(&pArr[i][j].b, 1, 1, file);            
         }       
     }
 }
 
 void writePixelsPPM(FILE* file, struct Pixel** pArr, int width, int height)
-{
+{    
     int i, j;
 
     for (i = 0; i < height; i++)
     {
         for (j = 0; j < width; j++)
         {
-            fwrite(&pArr[i][j].b, 1, 1, file);
-            fwrite(&pArr[i][j].g, 1, 1, file);
             fwrite(&pArr[i][j].r, 1, 1, file);
+            fwrite(&pArr[i][j].g, 1, 1, file);
+            fwrite(&pArr[i][j].b, 1, 1, file);
         }
         
     }
