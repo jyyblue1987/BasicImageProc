@@ -74,6 +74,15 @@ void main(int argc, char *argv[])
         readBMPHeader(file, header);
         readDIBHeader(file, DIBheader);
 
+        width = DIBheader->width;
+        height = DIBheader->height;
+
+        img = (struct Pixel**) malloc(height * sizeof(struct Pixel*));
+        for(int i = 0; i < height; i++)
+            img[i] = (struct Pixel*) malloc(width * sizeof(struct Pixel));
+
+        readPixelsBMP(file, img, width, height);
+
         free(header);
         free(DIBheader);
     }

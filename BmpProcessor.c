@@ -44,10 +44,10 @@ void readDIBHeader(FILE *file, struct DIB_Header *header)
     printf("DIB header size: %d\n", header->size);
     
     fread(&header->width, sizeof(int), 1, file);
-    printf("Image Height size: %d\n", header->height);
+    printf("Image Width size: %d\n", header->width);
 
     fread(&header->height, sizeof(int), 1, file);
-    printf("Image Width size: %d\n", header->width);
+    printf("Image Height size: %d\n", header->height);
 
     fread(&header->planes, sizeof(short), 1, file);
     printf("Image Planes: %d\n", header->planes);
@@ -131,29 +131,37 @@ void makeDIBHeader(struct DIB_Header *header, int width, int height)
 
 void readPixelsBMP(FILE *file, struct Pixel **pArr, int width, int height)
 {
-    int i, j, padding;
-    char temp[4];
-    padding = width % 4;
+    int i, j;
+    
+    int paddedRowSize = width * 3;
+    if( width % 4 != 0)
+        paddedRowSize = (width / 4 + 1) * 3;
 
+    int unpaddedRowSize = width * 3;
+    int padding = paddedRowSize - unpaddedRowSize;
+
+    char *temp = NULL;
     if (padding != 0)
     {
-        padding = (4 - (3 * width) % 4) % 4;
+        temp = (char *) malloc(padding * sizeof(char));
     }
-    // read in data
-    for (i = 0; i < width; i++)
+
+    for (i = 0; i < height; i++)
     {
-        for (j = 0; j < height; j++)
+        for (j = 0; j < width; j++)
         {
-            fread(&pArr[i][j].b, 1, 1, file);
-            fread(&pArr[i][j].g, 1, 1, file);
-            fread(&pArr[i][j].r, 1, 1, file);
+            fread(&pArr[height - i - 1][j].b, 1, 1, file);
+            fread(&pArr[height - i - 1][j].g, 1, 1, file);
+            fread(&pArr[height - i - 1][j].r, 1, 1, file);
         }
         if (padding != 0)
         {
-            if (fread(&temp, padding, 1, file) != 1)
-                printf("\nError reading padding in row %d \n", i);
+            fwrite(temp, padding, 1, file);
         }
     }
+
+    if( padding != 0 )
+        free(temp);
 }
 
 void writePixelsBMP(FILE *file, struct Pixel **pArr, int width, int height)
